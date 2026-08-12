@@ -1,17 +1,26 @@
 version: '3.8'
 
 services:
-  s3-drive:
+  # 🔒 Secure Node Express API Proxy Server
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: s3-drive-backend
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env
+    restart: always
+
+  # 🎨 Production React Web Application (Nginx)
+  frontend:
     build:
       context: .
       dockerfile: Dockerfile
-      args:
-        VITE_AWS_BUCKET_NAME: ${VITE_AWS_BUCKET_NAME:-therahulpatil-s3-dri-rcon1rds9z49mbwho9zdezjgojrkqaps3b-s3alias}
-        VITE_AWS_REGION: ${VITE_AWS_REGION:-ap-south-1}
-        VITE_AWS_ACCESS_KEY_ID: ${VITE_AWS_ACCESS_KEY_ID:-}
-        VITE_AWS_SECRET_ACCESS_KEY: ${VITE_AWS_SECRET_ACCESS_KEY:-}
-        VITE_AWS_ENDPOINT: ${VITE_AWS_ENDPOINT:-}
-    container_name: s3-drive-container
+    container_name: s3-drive-frontend
     ports:
       - "8080:80"
+    depends_on:
+      - backend
     restart: always
