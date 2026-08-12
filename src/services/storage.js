@@ -5,13 +5,13 @@ const STARRED_KEY = 's3_drive_starred_items';
 const TRASH_KEY = 's3_drive_trash_items';
 
 export const DEFAULT_CONFIG = {
-  bucketName: 'your-s3-bucket-or-access-point-alias',
+  bucketName: 'therahulpatil-s3-dri-rcon1rds9z49mbwho9zdezjgojrkqaps3b-s3alias',
   region: 'ap-south-1',
   accessKeyId: '',
   secretAccessKey: '',
   endpoint: '',
   forcePathStyle: false,
-  isDemoMode: true,
+  isDemoMode: false,
   useBackendProxy: false
 };
 
@@ -20,10 +20,9 @@ export const getS3Config = () => {
     const saved = localStorage.getItem(CONFIG_KEY);
     if (saved) {
       const parsed = JSON.parse(saved);
-      // Clean stale dummy keys or specific personal alias defaults
-      if (parsed.accessKeyId === 'YOUR_S3_DRIVE_ACCESS_KEY_ID' || parsed.accessKeyId === 'AKIA...') {
-        parsed.accessKeyId = '';
-        parsed.secretAccessKey = '';
+      // Ensure real bucket alias is maintained
+      if (!parsed.bucketName || parsed.bucketName.includes('your-s3-bucket')) {
+        parsed.bucketName = DEFAULT_CONFIG.bucketName;
       }
       return { ...DEFAULT_CONFIG, ...parsed };
     }
@@ -52,7 +51,7 @@ export const getStarredKeys = () => {
 
 export const saveStarredKeys = (starredKeys) => {
   try {
-    saveStarredKeys(starredKeys);
+    localStorage.setItem(STARRED_KEY, JSON.stringify(starredKeys));
   } catch (e) {
     console.error('Failed to save starred items:', e);
   }
