@@ -301,5 +301,53 @@ Your full-stack application will be live at:
 
 ---
 
+## 🧹 Environment Teardown & Cleanup Guide
+
+Follow these steps when you want to stop servers, delete containers, or clean up build artifacts:
+
+### 1. Stop & Remove Docker Containers
+```bash
+# Stop and remove running containers, networks, and volumes
+docker compose down -v --remove-orphans
+
+# Deep clean all unused Docker images, containers, and build cache
+docker system prune -a --volumes -f
+```
+
+### 2. Stop PM2 & Node.js Server Processes
+```bash
+# Stop and delete PM2 process
+pm2 stop s3-drive-backend
+pm2 delete s3-drive-backend
+
+# Stop PM2 daemon
+pm2 kill
+```
+
+### 3. Kill Local Node.js Processes (Port 3000 & 5000)
+
+**Linux / Mac / EC2 Ubuntu:**
+```bash
+# Kill processes running on ports 3000 and 5000
+npx kill-port 3000 5000
+```
+
+**Windows PowerShell:**
+```powershell
+# Stop all running Node.js background processes
+Get-Process node -ErrorAction SilentlyContinue | Stop-Process -Force
+```
+
+### 4. Remove Build Artifacts & Installed Dependencies
+```bash
+# Linux / Mac / EC2 Ubuntu:
+rm -rf node_modules dist .vite
+
+# Windows PowerShell:
+Remove-Item -Path node_modules, dist -Recurse -Force -ErrorAction SilentlyContinue
+```
+
+---
+
 ## 📄 License
 Licensed under the [MIT License](LICENSE).
