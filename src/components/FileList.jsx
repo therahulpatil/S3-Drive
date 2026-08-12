@@ -19,7 +19,8 @@ export default function FileList({
   onFilePreview,
   onShareLink,
   onDelete,
-  onDownloadFolder
+  onDownloadFolder,
+  onDownloadFile
 }) {
   return (
     <div className="table-container">
@@ -137,6 +138,14 @@ export default function FileList({
 
                 <td onClick={(e) => e.stopPropagation()}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '0.25rem' }}>
+                    <button
+                      className="icon-btn"
+                      onClick={() => onDownloadFile(file)}
+                      title="Download Object"
+                    >
+                      <Download size={16} style={{ color: 'var(--primary)' }} />
+                    </button>
+
                     <button
                       className="icon-btn"
                       onClick={() => onFilePreview(file)}

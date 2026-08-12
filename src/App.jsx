@@ -223,6 +223,25 @@ export default function App() {
     }
   };
 
+  // Single File Direct Download Handler
+  const handleDownloadFile = async (file) => {
+    try {
+      let downloadUrl = file.previewUrl;
+      if (!downloadUrl) {
+        downloadUrl = await generateS3PresignedUrl(s3Config, file.Key, 3600);
+      }
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = file.name;
+      link.target = '_blank';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (err) {
+      alert(`Download Failed: ${err.message}`);
+    }
+  };
+
   // Download Entire Folder as ZIP Handler
   const handleDownloadFolder = async (folderKey) => {
     const folderParts = folderKey.replace(/\/$/, '').split('/');
@@ -478,6 +497,7 @@ export default function App() {
               onShareLink={(file) => setShareFile(file)}
               onDelete={handleDeleteItem}
               onDownloadFolder={handleDownloadFolder}
+              onDownloadFile={handleDownloadFile}
             />
           ) : (
             <FileList
@@ -490,6 +510,7 @@ export default function App() {
               onShareLink={(file) => setShareFile(file)}
               onDelete={handleDeleteItem}
               onDownloadFolder={handleDownloadFolder}
+              onDownloadFile={handleDownloadFile}
             />
           )}
         </main>

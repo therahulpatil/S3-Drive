@@ -47,7 +47,8 @@ export default function FileGrid({
   onFilePreview,
   onShareLink,
   onDelete,
-  onDownloadFolder
+  onDownloadFolder,
+  onDownloadFile
 }) {
   return (
     <div>
@@ -143,28 +144,52 @@ export default function FileGrid({
                       getFileIcon(file.name, false)
                     )}
 
-                    {/* Star Badge */}
-                    <button
-                      className="icon-btn"
+                    {/* Top Right Action Overlay (Download & Star) */}
+                    <div
                       style={{
                         position: 'absolute',
                         top: '0.5rem',
                         right: '0.5rem',
-                        background: 'rgba(0,0,0,0.4)',
-                        color: isStarred ? '#f59e0b' : 'white',
-                        backdropFilter: 'blur(4px)'
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.35rem'
                       }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onToggleStar(file.Key);
-                      }}
-                      title={isStarred ? 'Unstar' : 'Star item'}
                     >
-                      <Star
-                        size={15}
-                        fill={isStarred ? '#f59e0b' : 'none'}
-                      />
-                    </button>
+                      <button
+                        className="icon-btn"
+                        style={{
+                          background: 'rgba(0,0,0,0.4)',
+                          color: 'white',
+                          backdropFilter: 'blur(4px)'
+                        }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onDownloadFile(file);
+                        }}
+                        title="Download Object"
+                      >
+                        <Download size={14} />
+                      </button>
+
+                      <button
+                        className="icon-btn"
+                        style={{
+                          background: 'rgba(0,0,0,0.4)',
+                          color: isStarred ? '#f59e0b' : 'white',
+                          backdropFilter: 'blur(4px)'
+                        }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onToggleStar(file.Key);
+                        }}
+                        title={isStarred ? 'Unstar' : 'Star item'}
+                      >
+                        <Star
+                          size={14}
+                          fill={isStarred ? '#f59e0b' : 'none'}
+                        />
+                      </button>
+                    </div>
                   </div>
 
                   {/* Details */}
