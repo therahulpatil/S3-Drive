@@ -1,0 +1,14 @@
+# Environment variables (Prevents leaking AWS keys to GitHub)
+.env
+.env.local
+.env.*.local
+*.log
+
+# Dependencies & Build artifacts
+node_modules/
+dist/
+dist-ssr/
+
+# Editor & OS files
+.DS_Store
+Thumbs.db
