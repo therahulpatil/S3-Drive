@@ -5,7 +5,7 @@ const STARRED_KEY = 's3_drive_starred_items';
 const TRASH_KEY = 's3_drive_trash_items';
 
 export const DEFAULT_CONFIG = {
-  bucketName: 'therahulpatil-s3-dri-rcon1rds9z49mbwho9zdezjgojrkqaps3b-s3alias',
+  bucketName: 'therahulpatil-s3.drive',
   region: 'ap-south-1',
   accessKeyId: '',
   secretAccessKey: '',
@@ -20,8 +20,8 @@ export const getS3Config = () => {
     const saved = localStorage.getItem(CONFIG_KEY);
     if (saved) {
       const parsed = JSON.parse(saved);
-      // Ensure real bucket alias is maintained
-      if (!parsed.bucketName || parsed.bucketName.includes('your-s3-bucket')) {
+      // Ensure real bucket name is maintained
+      if (!parsed.bucketName || parsed.bucketName.includes('your-s3-bucket') || parsed.bucketName.includes('s3alias')) {
         parsed.bucketName = DEFAULT_CONFIG.bucketName;
       }
       return { ...DEFAULT_CONFIG, ...parsed };
