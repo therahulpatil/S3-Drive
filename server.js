@@ -158,13 +158,34 @@ app.get('/api/s3/objects', async (req, res) => {
       };
     });
 
-    const files = (response.Contents || [])
-      .filter(item => item.Key !== prefix && !item.Key.endsWith('/'))
-      .map(item => ({
-        ...item,
-        name: item.Key.slice(prefix.length),
-        isFolder: false
-      }));
+    const files = await Promise.all(
+      (response.Contents || [])
+        .filter(item => item.Key !== prefix && !item.Key.endsWith('/'))
+        .map(async item => {
+          const name = item.Key.slice(prefix.length);
+          const ext = name.split('.').pop().toLowerCase();
+          let previewUrl = null;
+
+          if (['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp'].includes(ext)) {
+            try {
+              const getCmd = new GetObjectCommand({
+                Bucket: bucketName,
+                Key: item.Key
+              });
+              previewUrl = await getSignedUrl(client, getCmd, { expiresIn: 3600 });
+            } catch (e) {
+              console.error('Failed to generate preview URL for', item.Key, e);
+            }
+          }
+
+          return {
+            ...item,
+            name,
+            isFolder: false,
+            previewUrl
+          };
+        })
+    );
 
     res.json({ folders, files, bucketName });
   } catch (err) {
