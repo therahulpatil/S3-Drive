@@ -22,6 +22,92 @@ A production-grade, Google Drive-style web application for managing AWS S3 Bucke
 
 ---
 
+## 🛠️ Step-by-Step AWS Setup Guide (S3 + IAM User + Access Key)
+
+Follow this guide to set up your S3 bucket and IAM user in AWS Console:
+
+### Step 1: Create an S3 Bucket
+1. Open the [AWS S3 Console](https://s3.console.aws.amazon.com/).
+2. Click **Create bucket**.
+3. **Bucket name**: Enter a globally unique name (e.g. `my-company-s3-drive`).
+4. **AWS Region**: Select your preferred region (e.g., `ap-south-1` Mumbai).
+5. Leave **Block Public Access** settings at defaults (Public access blocked).
+6. Click **Create bucket**.
+
+#### Configure S3 CORS Policy (Cross-Origin Resource Sharing):
+1. In your bucket page, click the **Permissions** tab.
+2. Scroll down to **Cross-origin resource sharing (CORS)** ➔ Click **Edit**.
+3. Paste the following CORS configuration:
+```json
+[
+  {
+    "AllowedHeaders": ["*"],
+    "AllowedMethods": ["GET", "PUT", "POST", "DELETE", "HEAD"],
+    "AllowedOrigins": ["*"],
+    "ExposeHeaders": ["ETag"]
+  }
+]
+```
+4. Click **Save changes**.
+
+---
+
+### Step 2: Create IAM User (`s3-drive`)
+1. Open the [AWS IAM Console](https://console.aws.amazon.com/iam/).
+2. In the left navigation bar, click **Users** ➔ Click **Create user**.
+3. **User name**: Enter `s3-drive` (or your preferred username).
+4. Do **NOT** check "Provide user access to the AWS Management Console" (Keep it programmatic API access only).
+5. Click **Next**.
+
+---
+
+### Step 3: Attach IAM Policy to User
+
+#### Option A: Quick Setup (`AmazonS3FullAccess`)
+1. On the "Set permissions" step, select **Attach policies directly**.
+2. Search for `AmazonS3FullAccess`.
+3. Check the box next to **`AmazonS3FullAccess`** ➔ Click **Next** ➔ Click **Create user**.
+
+#### Option B: Production Scoped IAM Policy (Recommended)
+1. On the "Set permissions" step, click **Create policy**.
+2. Switch to the **JSON** tab and paste:
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:ListBucket",
+        "s3:GetObject",
+        "s3:PutObject",
+        "s3:DeleteObject"
+      ],
+      "Resource": [
+        "arn:aws:s3:::my-company-s3-drive",
+        "arn:aws:s3:::my-company-s3-drive/*"
+      ]
+    }
+  ]
+}
+```
+*(Replace `my-company-s3-drive` with your exact bucket name).*
+3. Name the policy `S3DriveBucketAccessPolicy` ➔ Click **Create policy**.
+4. Go back to user creation, select **Attach policies directly**, search for `S3DriveBucketAccessPolicy`, and click **Create user**.
+
+---
+
+### Step 4: Generate AWS Access Key & Secret Key
+1. In the IAM Console, click **Users** ➔ Select your newly created user (`s3-drive`).
+2. Click the **Security credentials** tab.
+3. Scroll down to **Access keys** ➔ Click **Create access key**.
+4. Select **Application running outside AWS** ➔ Click **Next**.
+5. Set an optional description tag (e.g. `S3 CloudDrive Web App Key`) ➔ Click **Create access key**.
+6. **IMPORTANT**: Copy your **Access key ID** and **Secret access key**. *(This is the only time the secret key will be shown)*.
+7. Paste these keys into your local `.env` file!
+
+---
+
 ## 🚀 Quick Start (Local Development)
 
 ### 1. Prerequisites
@@ -38,7 +124,7 @@ npm install
 ### 3. Create Environment File (`.env`)
 Create a `.env` file in the root directory:
 ```env
-AWS_BUCKET_NAME=your-s3-bucket-name
+AWS_BUCKET_NAME=my-company-s3-drive
 AWS_REGION=ap-south-1
 AWS_ACCESS_KEY_ID=YOUR_AWS_ACCESS_KEY_ID
 AWS_SECRET_ACCESS_KEY=YOUR_AWS_SECRET_ACCESS_KEY
@@ -98,7 +184,7 @@ nano .env
 
 Paste your production credentials into `.env`:
 ```env
-AWS_BUCKET_NAME=your-s3-bucket-name
+AWS_BUCKET_NAME=my-company-s3-drive
 AWS_REGION=ap-south-1
 AWS_ACCESS_KEY_ID=YOUR_IAM_ACCESS_KEY
 AWS_SECRET_ACCESS_KEY=YOUR_IAM_SECRET_KEY
@@ -192,7 +278,7 @@ nano .env
 
 Add your AWS credentials:
 ```env
-AWS_BUCKET_NAME=your-s3-bucket-name
+AWS_BUCKET_NAME=my-company-s3-drive
 AWS_REGION=ap-south-1
 AWS_ACCESS_KEY_ID=YOUR_IAM_ACCESS_KEY
 AWS_SECRET_ACCESS_KEY=YOUR_IAM_SECRET_KEY
@@ -212,33 +298,6 @@ docker compose ps
 
 Your full-stack application will be live at:
 👉 **`http://YOUR_EC2_PUBLIC_IP:8080`**
-
----
-
-## 🛡️ Recommended AWS IAM Policy
-
-Attach this scoped IAM policy to your `s3-drive` user in AWS Console:
-
-```json
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": [
-        "s3:ListBucket",
-        "s3:GetObject",
-        "s3:PutObject",
-        "s3:DeleteObject"
-      ],
-      "Resource": [
-        "arn:aws:s3:::your-s3-bucket-name",
-        "arn:aws:s3:::your-s3-bucket-name/*"
-      ]
-    }
-  ]
-}
-```
 
 ---
 
