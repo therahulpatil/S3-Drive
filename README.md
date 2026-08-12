@@ -39,7 +39,7 @@ npm install
 ### 3. Environment Configuration
 Create a `.env` file in the root directory:
 ```env
-AWS_BUCKET_NAME=therahulpatil-s3-dri-rcon1rds9z49mbwho9zdezjgojrkqaps3b-s3alias
+AWS_BUCKET_NAME=your-s3-bucket-or-access-point-alias
 AWS_REGION=ap-south-1
 AWS_ACCESS_KEY_ID=YOUR_IAM_ACCESS_KEY
 AWS_SECRET_ACCESS_KEY=YOUR_IAM_SECRET_KEY

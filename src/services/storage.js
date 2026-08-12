@@ -4,11 +4,8 @@ const CONFIG_KEY = 's3_drive_config_v1';
 const STARRED_KEY = 's3_drive_starred_items';
 const TRASH_KEY = 's3_drive_trash_items';
 
-const envAccessKey = import.meta.env.VITE_AWS_ACCESS_KEY_ID || '';
-const envSecretKey = import.meta.env.VITE_AWS_SECRET_ACCESS_KEY || '';
-
 export const DEFAULT_CONFIG = {
-  bucketName: 'therahulpatil-s3-dri-rcon1rds9z49mbwho9zdezjgojrkqaps3b-s3alias',
+  bucketName: 'your-s3-bucket-or-access-point-alias',
   region: 'ap-south-1',
   accessKeyId: '',
   secretAccessKey: '',
@@ -23,7 +20,7 @@ export const getS3Config = () => {
     const saved = localStorage.getItem(CONFIG_KEY);
     if (saved) {
       const parsed = JSON.parse(saved);
-      // Clean stale dummy keys if present
+      // Clean stale dummy keys or specific personal alias defaults
       if (parsed.accessKeyId === 'YOUR_S3_DRIVE_ACCESS_KEY_ID' || parsed.accessKeyId === 'AKIA...') {
         parsed.accessKeyId = '';
         parsed.secretAccessKey = '';
@@ -55,7 +52,7 @@ export const getStarredKeys = () => {
 
 export const saveStarredKeys = (starredKeys) => {
   try {
-    localStorage.setItem(STARRED_KEY, JSON.stringify(starredKeys));
+    saveStarredKeys(starredKeys);
   } catch (e) {
     console.error('Failed to save starred items:', e);
   }
