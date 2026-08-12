@@ -119,19 +119,41 @@ app.get('/api/s3/objects', async (req, res) => {
     const allResponse = await client.send(allCommand);
     const allContents = allResponse.Contents || [];
 
-    const folders = (response.CommonPrefixes || []).map(cp => {
+    const folderMap = new Map();
+
+    // 1. Add CommonPrefixes (virtual directory paths)
+    (response.CommonPrefixes || []).forEach(cp => {
       const folderKey = cp.Prefix;
-      // Calculate total size and item count for files matching folderKey
-      const childFiles = allContents.filter(item => item.Key.startsWith(folderKey) && !item.Key.endsWith('/'));
+      const name = folderKey.slice(prefix.length).replace(/\/$/, '');
+      if (name) {
+        folderMap.set(folderKey, name);
+      }
+    });
+
+    // 2. Add explicit folder objects ending in "/" (e.g. "Sunbeam/") from response.Contents
+    (response.Contents || []).forEach(item => {
+      if (item.Key !== prefix && item.Key.endsWith('/')) {
+        const folderKey = item.Key;
+        const relative = folderKey.slice(prefix.length);
+        const name = relative.split('/')[0];
+        if (name) {
+          const fullFolderKey = `${prefix}${name}/`;
+          folderMap.set(fullFolderKey, name);
+        }
+      }
+    });
+
+    const folders = Array.from(folderMap.entries()).map(([folderKey, name]) => {
+      const childFiles = allContents.filter(item => item.Key.startsWith(folderKey) && item.Key !== folderKey && !item.Key.endsWith('/'));
       const folderSize = childFiles.reduce((sum, item) => sum + (item.Size || 0), 0);
 
       return {
         Key: folderKey,
-        name: folderKey.slice(prefix.length).replace(/\/$/, ''),
+        name: name,
         isFolder: true,
         Size: folderSize,
         fileCount: childFiles.length,
-        LastModified: childFiles.length > 0 ? childFiles[0].LastModified : new Date(),
+        LastModified: new Date(),
         StorageClass: 'DIRECTORY'
       };
     });

@@ -389,10 +389,10 @@ function formatS3ListResults(items, prefix) {
     if (!relativeKey) return;
 
     const parts = relativeKey.split('/');
-    if (parts.length > 1) {
-      // It's inside a subfolder
+    if (parts.length > 1 || item.Key.endsWith('/')) {
+      // It's inside a subfolder or is an explicit folder object key (e.g. "Sunbeam/")
       const folderName = parts[0];
-      folderSet.add(folderName);
+      if (folderName) folderSet.add(folderName);
     } else if (!item.isFolder && relativeKey.length > 0) {
       files.push({
         ...item,
